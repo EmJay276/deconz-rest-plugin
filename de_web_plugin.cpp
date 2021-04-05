@@ -2702,9 +2702,9 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
             lightNode.addItem(DataTypeUInt8, RStateBri);
             lightNode.addItem(DataTypeUInt16, RStateHue);
             lightNode.addItem(DataTypeUInt8, RStateSat);
-            lightNode->removeItem(RStateAlert);
-            lightNode->removeItem(RStateX);
-            lightNode->removeItem(RStateY);
+            lightNode.removeItem(RStateAlert);
+            lightNode.removeItem(RStateX);
+            lightNode.removeItem(RStateY);
             
             ResourceItem *Type = lightNode.item(RAttrType);
             DBG_Assert(Type);
