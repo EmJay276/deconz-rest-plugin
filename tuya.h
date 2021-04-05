@@ -49,13 +49,16 @@
 #define DP_IDENTIFIER_WORK_STATE 0x05
 #define DP_IDENTIFIER_POSITION_MOVING 0x07
 
-// Value for dp_identifier for switches
+// Value for dp_identifier for switches/lights
 //-----------------------------------
 #define DP_IDENTIFIER_BUTTON_1 0x01
 #define DP_IDENTIFIER_BUTTON_2 0x02
 #define DP_IDENTIFIER_BUTTON_3 0x03
 #define DP_IDENTIFIER_DIMMER_LEVEL_MODE1 0x03
 #define DP_IDENTIFIER_DIMMER_LEVEL_MODE2 0x02
+#define DP_IDENTIFIER_COLOR_MODE 0x02
+#define DP_IDENTIFIER_COLOR_TEMP 0x04
+#define DP_IDENTIFIER_COLOR_RGB 0x05
 
 // Value for dp_identifier for siren
 //-----------------------------------

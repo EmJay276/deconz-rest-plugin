@@ -2696,6 +2696,24 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
             }
             lightNode.setNeedSaveDatabase(true);
         }
+        // Tuya light using the tuya cluster
+        if (R_GetProductId(&lightNode).startsWith(QLatin1String("Tuya_COLLIGHT")))
+        {
+            lightNode.addItem(DataTypeUInt8, RStateBri);
+            lightNode.addItem(DataTypeUInt16, RStateHue);
+            lightNode.addItem(DataTypeUInt8, RStateSat);
+            lightNode->removeItem(RStateAlert);
+            lightNode->removeItem(RStateX);
+            lightNode->removeItem(RStateY);
+            
+            ResourceItem *Type = lightNode.item(RAttrType);
+            DBG_Assert(Type);
+            if (Type)
+            {
+                Type->setValue(QString("Extended color light"));
+            }
+            lightNode.setNeedSaveDatabase(true);
+        }
 
         // Tanslate Tuya ManufacturerName
         const lidlDevice *device = getLidlDevice(lightNode.manufacturer());

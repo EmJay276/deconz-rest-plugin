@@ -480,6 +480,7 @@ static const ProductMap products[] =
     // Tuya_THD : thermostat device using Tuya cluster
     // Tuya_COVD : covering device using Tuya cluster
     // Tuya_DIMSWITCH : Dimmer switches using Tuya cluster
+    // Tuya_COLLIGHT : Light device using Tuya cluster for color
     // Tuya_RPT : Repeater
     
     // Tuya Thermostat / TRV
@@ -518,6 +519,9 @@ static const ProductMap products[] =
     {"_TZ3000_xzqbrqk1", "TS130F", "Lonsonho", "Zigbee curtain switch"}, // https://github.com/dresden-elektronik/deconz-rest-plugin/issues/3757#issuecomment-776201454
     {"_TZ3000_ltiqubue", "TS130F", "Tuya", "Zigbee curtain switch"},
     {"_TZ3000_vd43bbfq", "TS130F", "Tuya", "QS-Zigbee-C01 Module"}, // Curtain module QS-Zigbee-C01
+    
+    // Tuya light
+    {"_TZE200_3thxjahu", "TS0601", "Tuya", "Tuya_COLLIGHT LED Strip Light Controller 5 in 1 LED WZ5"},
 
     // Other
     {"_TYST11_d0yu2xgi", "0yu2xgi", "NEO/Tuya", "NAS-AB02B0 Siren"},

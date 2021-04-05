@@ -572,7 +572,12 @@ int DeRestPluginPrivate::setLightState(const ApiRequest &req, ApiResponse &rsp)
         {
             return setWindowCoveringState(req, rsp, taskRef, map);
         }
-        // light, don't use tuya stuff (for the moment)
+        // light using tuya cluster
+        else if (R_GetProductId(taskRef.lightNode).startsWith(QLatin1String("Tuya_COLLIGHT")))
+        {
+            return setTuyaDeviceState(req, rsp, taskRef, map);
+        }
+        // other light don't use tuya stuff
         else if (taskRef.lightNode->item(RStateColorMode))
         {
         }
@@ -1977,7 +1982,11 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
     bool targetOn = false;
     bool hasOn = false;
     bool hasBri = false;
+    bool hasHue = false;
+    bool hasSat = false;
     qint16 targetBri = 0;
+    quint16 targetHue = 0;
+    quint8 targetSat = 0;
     
     bool ok = false;
     
@@ -1985,8 +1994,12 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
     {
         if (map["bri"].type() == QVariant::Double)
         {
-            hasBri = true;
             targetBri = map["bri"].toUInt(&ok);
+            if (targetBri <= 0xFF)
+            {
+                hasBri = true;
+            }
+                
         }
     }
     if (map.contains("on") && taskRef.lightNode->item(RStateOn) )
@@ -1997,25 +2010,77 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
             targetOn = map["on"].toBool();
         }
     }
-
-    if (hasBri)
+    if (map.contains("hue") && taskRef.lightNode->item(RStateHue) )
     {
-        if (targetBri <= 0xFF)
+        if (map["hue"].type() == QVariant::Double)
         {
-            quint16 bri = targetBri * 1000 / 254;
-            QByteArray data = QByteArray("\x00\x00",2);
-            data.append(static_cast<qint8>((bri >> 8) & 0xff));
-            data.append(static_cast<qint8>(bri & 0xff));
-            
-            if (R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_DIMSWITCH Earda Dimmer") ||
-                R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_DIMSWITCH EDM-1ZAA-EU"))
+            const uint hue = map["hue"].toUInt(&ok);
+            if (ok && hue <= 0xFFFF)
             {
-                ok = sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_DIMMER_LEVEL_MODE2, data);
+                hasHue = true;
+                targetHue = hue;
+            }
+        }
+    }
+    if (map.contains("sat") && taskRef.lightNode->item(RStateSat) )
+    {
+        if (map["sat"].type() == QVariant::Double)
+        {
+            const uint sat = map["sat"].toUInt(&ok);
+            if (ok && sat <= 0xFF)
+            {
+                hasSat = true;
+                targetSat = sat > 0xFE ? 0xFE : sat;
+            }
+        }
+    }
+
+    if (hasHue)
+    {
+        //need to bri and sat
+        if (hasBri && hasSat)
+        {
+            quint16 h = round(targetHue * 360.0 / 0xFFFF);
+            quint16 s = 10 * round(targetSat * 100.0 / 0xFF);
+            quint16 l = 10 * round(targetBri * 100.0 / 0xFF);
+
+            QByteArray data;
+            QDataStream stream2(&data, QIODevice::WriteOnly);
+            stream2.setByteOrder(QDataStream::LittleEndian);
+            stream2 << h;
+            stream2 << s;
+            stream2 << l;
+
+            if (sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_STRING, DP_IDENTIFIER_COLOR_RGB, data);)
+            {
+                QVariantMap rspItem;
+                QVariantMap rspItemState;
+                rspItemState[QString("/lights/%1/state/bri").arg(id)] = targetBri;
+                rspItem["success"] = rspItemState;
+                rsp.list.append(rspItem);
             }
             else
             {
-                ok = sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_DIMMER_LEVEL_MODE1, data);
+                rsp.list.append(errorToMap(ERR_INTERNAL_ERROR, QString("/lights/%1").arg(id), QString("Internal error, %1").arg(ERR_BRIDGE_BUSY)));
             }
+        }
+    }
+
+    if (hasBri)
+    {
+        quint16 bri = targetBri * 1000 / 254;
+        QByteArray data = QByteArray("\x00\x00",2);
+        data.append(static_cast<qint8>((bri >> 8) & 0xff));
+        data.append(static_cast<qint8>(bri & 0xff));
+        
+        if (R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_DIMSWITCH Earda Dimmer") ||
+            R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_DIMSWITCH EDM-1ZAA-EU"))
+        {
+            ok = sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_DIMMER_LEVEL_MODE2, data);
+        }
+        else
+        {
+            ok = sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_DIMMER_LEVEL_MODE1, data);
         }
         
         if (ok)
@@ -2073,7 +2138,7 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
 
     }
     
-    if (!hasOn && !hasBri)
+    if (!hasOn && !hasBri && !hasHue)
     {
         rsp.list.append(errorToMap(ERR_PARAMETER_NOT_AVAILABLE, QString("/lights/%1/state").arg(id), QString("parameter not available")));
         rsp.httpStatus = HttpStatusBadRequest;
