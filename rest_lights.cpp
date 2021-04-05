@@ -2051,7 +2051,7 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
             stream2 << s;
             stream2 << l;
 
-            if (sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_STRING, DP_IDENTIFIER_COLOR_RGB, data);)
+            if (sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_STRING, DP_IDENTIFIER_COLOR_RGB, data))
             {
                 QVariantMap rspItem;
                 QVariantMap rspItemState;
