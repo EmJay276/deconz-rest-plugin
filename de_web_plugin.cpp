@@ -954,8 +954,8 @@ void DeRestPluginPrivate::apsdeDataIndication(const deCONZ::ApsDataIndication &i
             break;
 
         case TIME_CLUSTER_ID:
-            Sensor *sensorNodetest = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint());
-            if (sensorNodetest && sensorNodetest->manufacturer() != QLatin1String("_TZ3000_9hpxg80k"))
+            LightNode *lightNodetest = getLightNodeForAddress(ind.srcAddress(), ind.srcEndpoint());
+            if (lightNodetest && lightNodetest->manufacturer() != QLatin1String("_TZ3000_9hpxg80k"))
             {
                 handleTimeClusterIndication(ind, zclFrame);
             }
