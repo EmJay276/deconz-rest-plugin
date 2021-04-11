@@ -954,7 +954,11 @@ void DeRestPluginPrivate::apsdeDataIndication(const deCONZ::ApsDataIndication &i
             break;
 
         case TIME_CLUSTER_ID:
-            handleTimeClusterIndication(ind, zclFrame);
+            Sensor *sensorNodetest = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint());
+            if (sensorNodetest && sensorNodetest->manufacturer() != QLatin1String("_TZ3000_9hpxg80k"))
+            {
+                handleTimeClusterIndication(ind, zclFrame);
+            }
             break;
 
         case WINDOW_COVERING_CLUSTER_ID:
