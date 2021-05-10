@@ -1511,7 +1511,8 @@ int DeRestPluginPrivate::setLightState(const ApiRequest &req, ApiResponse &rsp)
         }
         else
         {
-            const quint8 cmd = taskRef.lightNode->manufacturerCode() == VENDOR_PHILIPS // FIXME: use light capabilities
+            const quint16 manufacturerCode = taskRef.lightNode->manufacturerCode();
+            const quint8 cmd = (manufacturerCode == VENDOR_PHILIPS || manufacturerCode == VENDOR_IKEA)
                     ? ONOFF_COMMAND_OFF_WITH_EFFECT
                     : ONOFF_COMMAND_OFF;
             ok = addTaskSetOnOff(task, cmd, 0, 0);
@@ -1731,6 +1732,7 @@ int DeRestPluginPrivate::setWindowCoveringState(const ApiRequest &req, ApiRespon
             R_GetProductId(taskRef.lightNode) == QLatin1String("Zigbee curtain switch") ||
             R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_COVD YS-MT750") ||
             R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_COVD DS82") ||
+            taskRef.lightNode->modelId() == QLatin1String("D10110") ||
             taskRef.lightNode->modelId() == QLatin1String("Motor Controller"))
         {
             targetLiftZigBee = 100 - targetLift;
@@ -1902,7 +1904,14 @@ int DeRestPluginPrivate::setWindowCoveringState(const ApiRequest &req, ApiRespon
 
         if (cluster == TUYA_CLUSTER_ID)
         {
-            if (targetOpen)
+            // Reverse side for open/close command
+            bool targetOpen2 = targetOpen;
+            if (R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_COVD M515EGB"))
+            {
+                targetOpen2 = !targetOpen;
+            }
+
+            if (targetOpen2)
             {
                 ok = sendTuyaRequest(task, TaskTuyaRequest, DP_TYPE_ENUM, DP_IDENTIFIER_CONTROL, QByteArray("\x02", 1));
             }
@@ -1980,6 +1989,7 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
     bool targetOn = false;
     bool hasOn = false;
     bool hasBri = false;
+    bool hasAlert = false;
     uint targetBri = 0;
     
     bool ok = false;
@@ -2015,6 +2025,14 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
             {
                 rsp.list.append(errorToMap(ERR_INVALID_VALUE, QString("/lights/%1/state").arg(id), QString("invalid value, %1, for parameter, on").arg(map["on"].toString())));
             }
+        }
+        
+        else if (p.key() == "alert")	
+        {	
+            if (map[p.key()].type() == QVariant::String)	
+            {	
+                hasAlert = true;	
+            }	
         }
 
         else
@@ -2100,6 +2118,29 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
             rsp.list.append(errorToMap(ERR_INTERNAL_ERROR, QString("/lights/%1").arg(id), QString("Internal error, %1").arg(ERR_BRIDGE_BUSY)));
         }
 
+    }
+    
+    if (hasAlert)	
+    {	
+        QByteArray data("\x00", 1);	
+    
+        if (map["alert"].toString() == "lselect")	
+        {	
+            data = QByteArray("\x01",1);	
+        }	
+    
+        if (sendTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_BOOL, DP_IDENTIFIER_ALARM, data))	
+        {	
+            QVariantMap rspItem;	
+            QVariantMap rspItemState;	
+            rspItemState[QString("/lights/%1/state/alert").arg(id)] = map["alert"].toString();	
+            rspItem["success"] = rspItemState;	
+            rsp.list.append(rspItem);	
+        }	
+        else	
+        {	
+            rsp.list.append(errorToMap(ERR_INTERNAL_ERROR, QString("/lights/%1").arg(id), QString("Internal error, %1").arg(ERR_BRIDGE_BUSY)));	
+        }	
     }
 
     return REQ_READY_SEND;

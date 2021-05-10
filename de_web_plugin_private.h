@@ -90,7 +90,6 @@ using namespace deCONZ::literals;
 #define MAX_UNLOCK_GATEWAY_TIME 600
 #define MAX_RECOVER_ENTRY_AGE 600
 #define PERMIT_JOIN_SEND_INTERVAL (1000 * 1800)
-#define EXT_PROCESS_TIMEOUT 10000
 #define SET_ENDPOINTCONFIG_DURATION (1000 * 16) // time deCONZ needs to update Endpoints
 #define OTA_LOW_PRIORITY_TIME (60 * 2)
 #define CHECK_SENSOR_FAST_ROUNDS 3
@@ -347,6 +346,7 @@ using namespace deCONZ::literals;
 #define VENDOR_CLS                  0x104E
 #define VENDOR_CENTRALITE           0x104E // wrong name?
 #define VENDOR_SI_LABS              0x1049
+#define VENDOR_SCHNEIDER            0x105E
 #define VENDOR_4_NOKS               0x1071
 #define VENDOR_BITRON               0x1071 // branded
 #define VENDOR_COMPUTIME            0x1078
@@ -480,7 +480,7 @@ using namespace deCONZ::literals;
 
 #define DB_HUGE_SAVE_DELAY  (60 * 60 * 1000) // 60 minutes
 #define DB_LONG_SAVE_DELAY  (15 * 60 * 1000) // 15 minutes
-#define DB_SHORT_SAVE_DELAY (5 *  1 * 1000) // 5 seconds
+#define DB_SHORT_SAVE_DELAY (1 *  60 * 1000) // 1 minute
 
 #define DB_CONNECTION_TTL (60 * 15) // 15 minutes
 
@@ -539,6 +539,7 @@ extern const quint64 xalMacPrefix;
 extern const quint64 onestiPrefix;
 extern const quint64 develcoMacPrefix;
 extern const quint64 legrandMacPrefix;
+extern const quint64 YooksmartMacPrefix;
 extern const quint64 profaluxMacPrefix;
 extern const quint64 xiaomiMacPrefix;
 extern const quint64 computimeMacPrefix;
@@ -1270,13 +1271,7 @@ public:
     void initResetDeviceApi();
 
     //Timezone
-    // std::string getTimezone();
     QVariantList getTimezones();
-
-    //Export/Import/Reset Configuration
-    bool exportConfiguration();
-    bool importConfiguration();
-    bool resetConfiguration(bool resetGW, bool deleteDB);
 
 public Q_SLOTS:
     Resource *getResource(const char *resource, const QString &id = QString());
@@ -1618,7 +1613,8 @@ public:
     bool deserialiseThermostatTransitions(const QString &s, QVariantList *transitions);
     bool serialiseThermostatSchedule(const QVariantMap &schedule, QString *s);
     bool deserialiseThermostatSchedule(const QString &s, QVariantMap *schedule);
-    void handleSimpleMeteringClusterIndication(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame);
+    void handleSimpleMeteringClusterIndication(const deCONZ::ApsDataIndication &ind, const deCONZ::ZclFrame &zclFrame);
+    void handleElectricalMeasurementClusterIndication(const deCONZ::ApsDataIndication &ind, const deCONZ::ZclFrame &zclFrame);
 
     // Modify node attributes
     void setAttributeOnOff(LightNode *lightNode);
