@@ -2646,15 +2646,11 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
     // Create task
     TaskItem task;
     task.req.dstAddress() = sensor->address();
-    task.req.setTxOptions(deCONZ::ApsTxAcknowledgedTransmission);
+    // don't use deCONZ::ApsTxAcknowledgedTransmission, because for the moment it provoke deconz make 3 time the request
+    task.req.setTxOptions(0x00);
     task.req.setDstEndpoint(sensor->fingerPrint().endpoint);
     task.req.setSrcEndpoint(getSrcEndpoint(sensor, task.req));
     task.req.setDstAddressMode(deCONZ::ApsExtAddress);
-    
-    // To test
-    //task.req.setTxOptions(0);
-    //task.req.setDstAddressMode(deCONZ::ApsNwkAddress);
-    //task.req.dstAddress().setNwk(sensor->address().nwk());
 
     if (req.hdr.method() == "GET")
     {        
