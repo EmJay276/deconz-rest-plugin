@@ -52,6 +52,9 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
         sendZclDefaultResponse(ind, zclFrame, deCONZ::ZclSuccessStatus);
     }
 
+    QDataStream stream(zclFrame.payload());
+    stream.setByteOrder(QDataStream::LittleEndian);
+
     bool isReadAttr = false;
     bool isReporting = false;
     if (zclFrame.isProfileWideCommand() && zclFrame.commandId() == deCONZ::ZclReadAttributesResponseId)
@@ -201,10 +204,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
     {
         if (zclFrame.frameControl() & deCONZ::ZclFCDirectionServerToClient)
         {
-            
-            QDataStream stream(zclFrame.payload());
-            stream.setByteOrder(QDataStream::LittleEndian);
-            
             if (zclFrame.commandId() == COMMAND_SET_PIN)
             {
                 quint8 status;
@@ -375,7 +374,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 {
                     char s[5];
                     sprintf(s, "%04d", pin);
-                    QString action = QString("source:%1,code:%2,pin:%3").arg(sourcename).arg(codename).arg(s);
+                    QString action = QString("source:%1, code:%2, pin:%3").arg(sourcename).arg(codename).arg(s);
                     item->setValue(action);
                     Event e(RSensors, RStateNotification, sensorNode->id(), item);
                     enqueueEvent(e);
