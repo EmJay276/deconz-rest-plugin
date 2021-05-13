@@ -2634,7 +2634,6 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
         {
             userID = req.path[6].toUInt(&ok);
         }
-        
     }
     if (!ok)
     {

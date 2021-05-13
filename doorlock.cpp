@@ -38,8 +38,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
     
     QString zclPayload = zclFrame.payload().isEmpty() ? "None" : qPrintable(zclFrame.payload().toHex().toUpper());
     DBG_Printf(DBG_INFO, "Door lock debug 0x%016llX, command  0x%02X, payload %s\n", ind.srcAddress().ext(), zclFrame.commandId(), qPrintable(zclPayload) );
-    
-    
+
     Sensor *sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHADoorLock"));
     if (!sensorNode)
     {
@@ -221,7 +220,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 stream >> status;
                 
                 DBG_Printf(DBG_INFO, "[Door lock] - Clear PIN command received, Status: %d\n", status);
-                
             }
             else if (zclFrame.commandId() == COMMAND_READ_PIN)
             {
@@ -255,7 +253,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 DBG_Printf(DBG_INFO, "[Door lock] - Read PIN command received, User ID: %d, code: %s, Status: %d, Type %d\n", userID , qPrintable(code) ,status, type);
 
                 QString data;
-                
                 ResourceItem *item = sensorNode->item(RStatePin);
 
                 if (item && !item->toString().isEmpty())
@@ -324,11 +321,9 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                     enqueueEvent(e);
                     stateUpdated = true;
                 }
-                
             }
             else if (zclFrame.commandId() == OPERATION_EVENT_NOTIFICATON)
             {
-                
                 QDataStream stream(zclFrame.payload());
                 stream.setByteOrder(QDataStream::LittleEndian);
 
@@ -378,7 +373,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                     enqueueEvent(e);
                     stateUpdated = true;
                 }
-
             }
         }
         else
@@ -402,7 +396,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
     
 }
 
-
 /*! Add doorlock Get Pin task to the queue.
 
     \param task - the task item
@@ -418,7 +411,7 @@ bool DeRestPluginPrivate::addTaskDoorLockPin(TaskItem &task, quint8 command, qui
 
     task.zclFrame.payload().clear();
     task.zclFrame.setSequenceNumber(zclSeq++);
-    task.zclFrame.setCommandId(command); // Get Pin
+    task.zclFrame.setCommandId(command);
     task.zclFrame.setFrameControl(deCONZ::ZclFCClusterCommand |
                                   deCONZ::ZclFCDirectionClientToServer |
                                   deCONZ::ZclFCDisableDefaultResponse);
