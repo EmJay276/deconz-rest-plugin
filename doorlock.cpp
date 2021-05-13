@@ -129,21 +129,21 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                     }
 
                     // Update RConfigLock bool state
-                    item = sensor->item(RConfigLock);
+                    item = sensorNode->item(RConfigLock);
                     if (item && item->toNumber() != dlLock)
                     {
                         item->setValue(dlLock);
                         enqueueEvent(Event(RSensors, RConfigLock, sensorNode->id(), item));
-                        updated = true;
+                        configUpdated = true;
                     }
 
                     // Update RStateLockState Str value
-                    item = sensor->item(RStateLockState);
+                    item = sensorNode->item(RStateLockState);
                     if (item && item->toString() != str)
                     {
                         item->setValue(str);
                         enqueueEvent(Event(RSensors, RStateLockState, sensorNode->id(), item));
-                        updated = true;
+                        configUpdated = true;
                     }
                 
                     sensorNode->setZclValue(updateType, ind.srcEndpoint(), DOOR_LOCK_CLUSTER_ID, attrId, attr.numericValue());
@@ -185,7 +185,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                     {
                         item->setValue(str);
                         enqueueEvent(Event(RSensors, RStateDoorState, sensorNode->id(), item));
-                        updated = true;
+                        configUpdated = true;
                     }
                 
                     sensorNode->setZclValue(updateType, ind.srcEndpoint(), DOOR_LOCK_CLUSTER_ID, attrId, attr.numericValue());
