@@ -37,7 +37,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
 {
     
     QString zclPayload = zclFrame.payload().isEmpty() ? "None" : qPrintable(zclFrame.payload().toHex().toUpper());
-    DBG_Printf(DBG_INFO, "Door lock debug 0x%016llX, command  0x%02X, payload %s\n", ind.srcAddress().ext(), zclFrame.commandId(), qPrintable(zclPayload) );
+    DBG_Printf(DBG_INFO, "[Door lock] - Device 0x%016llX, command  0x%02X, payload %s\n", ind.srcAddress().ext(), zclFrame.commandId(), qPrintable(zclPayload) );
 
     Sensor *sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHADoorLock"));
     if (!sensorNode)
@@ -265,54 +265,49 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 }
                 
                 data = data.replace(QLatin1String("\\\""), QLatin1String("\""));
-                
-                DBG_Printf(DBG_INFO, "Door lock debug : data %s\n", qPrintable(data));
 
-                if (true)
+                //Transform qstring to json
+                QVariant var = Json::parse(data);
+                QVariantList list = var.toList();
+                QVariantList list2;
+                
+                bool exist = false;
+                quint16 id;
+                
+                foreach (const QVariant & v, list)
                 {
-                    //Transform qstring to json
-                    QVariant var = Json::parse(data);
-                    QVariantList list = var.toList();
-                    QVariantList list2;
+                    QVariantMap map = v.toMap();
                     
-                    bool exist = false;
-                    quint16 id;
-                    
-                    foreach (const QVariant & v, list)
+                    if (map["id"].type() == QVariant::Double)
                     {
-                        QVariantMap map = v.toMap();
+                        id = map["id"].toInt();
                         
-                        if (map["id"].type() == QVariant::Double)
+                        //If exist, update
+                        if (id == userID)
                         {
-                            id = map["id"].toInt();
+                            map["status"] = status;
+                            map["type"] = type;
+                            map["code"] = code;
                             
-                            //If exist, update
-                            if (id == userID)
-                            {
-                                map["status"] = status;
-                                map["type"] = type;
-                                map["code"] = code;
-                                
-                                exist = true;
-                            }
+                            exist = true;
                         }
-                        list2.append(map);
                     }
-                    
-                    //If not exist, add it
-                    if (!exist)
-                    {
-                        QVariantMap map2;
-                        map2.insert("id", userID);
-                        map2.insert("status",status);
-                        map2.insert("type", type);
-                        map2.insert("code", code);
-                        list2.append(map2);
-                    }
-         
-                    //Transform Json array to qstring
-                    data = Json::serialize(list2);
+                    list2.append(map);
                 }
+                
+                //If not exist, add it
+                if (!exist)
+                {
+                    QVariantMap map2;
+                    map2.insert("id", userID);
+                    map2.insert("status",status);
+                    map2.insert("type", type);
+                    map2.insert("code", code);
+                    list2.append(map2);
+                }
+     
+                //Transform Json array to qstring
+                data = Json::serialize(list2);
 
                 if (item)
                 {
@@ -339,7 +334,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 stream >> pin;
                 stream >> localtime;
                 
-                DBG_Printf(DBG_INFO, "Door lock notifications > source: 0x%02X, code: 0x%02X, pin: 0x%04X local time:0x%02X", source, code, pin, localtime);
+                DBG_Printf(DBG_INFO, "[Door lock] Notifications > source: 0x%02X, code: 0x%02X, pin: 0x%04X local time:0x%02X", source, code, pin, localtime);
                 
                 //Source name
                 QString sourcename;
@@ -393,7 +388,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
         sensorNode->setNeedSaveDatabase(true);
         queSaveDb(DB_SENSORS, DB_SHORT_SAVE_DELAY);
     }
-    
 }
 
 /*! Add doorlock Get Pin task to the queue.
