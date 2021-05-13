@@ -51,9 +51,152 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
     {
         sendZclDefaultResponse(ind, zclFrame, deCONZ::ZclSuccessStatus);
     }
-    
-    bool stateUpdated;
 
+    bool isReadAttr = false;
+    bool isReporting = false;
+    if (zclFrame.isProfileWideCommand() && zclFrame.commandId() == deCONZ::ZclReadAttributesResponseId)
+    {
+        isReadAttr = true;
+    }
+    if (zclFrame.isProfileWideCommand() && zclFrame.commandId() == deCONZ::ZclReportAttributesId)
+    {
+        isReporting = true;
+    }
+    
+    bool stateUpdated = false;
+    bool configUpdated = false;
+
+    // Read attribute or Reporting ?
+    if (isReadAttr || isReporting)
+    {
+        const NodeValue::UpdateType updateType = isReadAttr ? NodeValue::UpdateByZclRead : NodeValue::UpdateByZclReport;
+
+        while (!stream.atEnd())
+        {
+            quint16 attrId;
+            quint8 attrTypeId;
+
+            stream >> attrId;
+            if (isReadAttr)
+            {
+                quint8 status;
+                stream >> status;  // Read Attribute Response status
+                if (status != deCONZ::ZclSuccessStatus)
+                {
+                    continue;
+                }
+            }
+            stream >> attrTypeId;
+
+            deCONZ::ZclAttribute attr(attrId, attrTypeId, QLatin1String(""), deCONZ::ZclRead, false);
+
+            if (!attr.readFromStream(stream))
+            {
+                continue;
+            }
+
+            ResourceItem *item = nullptr;
+            
+            switch (attrId)
+            {
+                case 0x0000: // Lock state
+                {
+                    QString str;
+                    bool dlLock;
+
+                    if (attr.numericValue().u8 == 1)
+                    {
+                        str = QLatin1String("locked");
+                        dlLock = true;
+                    }
+                    else if (attr.numericValue().u8 == 0)
+                    {
+                        str = QLatin1String("not fully locked");
+                        dlLock = false;
+                    }
+                    else if (attr.numericValue().u8 == 2)
+                    {
+                        str = QLatin1String("unlocked");
+                        dlLock = false;
+                    }
+                    else
+                    {
+                        str = QLatin1String("undefined");
+                        dlLock = false;
+                    }
+
+                    // Update RConfigLock bool state
+                    ResourceItem *item = i->item(RConfigLock);
+                    if (item && item->toNumber() != dlLock)
+                    {
+                        item->setValue(dlLock);
+                        enqueueEvent(Event(RSensors, RConfigLock, i->id(), item));
+                        updated = true;
+                    }
+
+                    // Update RStateLockState Str value
+                    item = i->item(RStateLockState);
+                    if (item && item->toString() != str)
+                    {
+                        item->setValue(str);
+                        enqueueEvent(Event(RSensors, RStateLockState, i->id(), item));
+                        updated = true;
+                    }
+                
+                    sensorNode->setZclValue(updateType, ind.srcEndpoint(), DOOR_LOCK_CLUSTER_ID, attrId, attr.numericValue());
+                }
+                    break;
+
+                case 0x0003: // Door state
+                {
+                    QString str;
+
+                    if (attr.numericValue().u8 == 0)
+                    {
+                        str = QLatin1String("open");
+                    }
+                    else if (attr.numericValue().u8 == 1)
+                    {
+                        str = QLatin1String("closed");
+                    }
+                    else if (attr.numericValue().u8 == 2)
+                    {
+                        str = QLatin1String("error jammed");
+                    }
+                    else if (attr.numericValue().u8 == 3)
+                    {
+                        str = QLatin1String("error forced open");
+                    }
+                    else if (attr.numericValue().u8 == 4)
+                    {
+                        str = QLatin1String("error unspecified");
+                    }
+                    else
+                    {
+                        str = QLatin1String("undefined");
+                    }
+
+                    // Update RStateDoorState Str value
+                    ResourceItem *item = i->item(RStateDoorState);
+                    if (item && item->toString() != str)
+                    {
+                        item->setValue(str);
+                        enqueueEvent(Event(RSensors, RStateDoorState, i->id(), item));
+                        updated = true;
+                    }
+                
+                    sensorNode->setZclValue(updateType, ind.srcEndpoint(), DOOR_LOCK_CLUSTER_ID, attrId, attr.numericValue());
+                }
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+    }
+    //Cluster command ?
     if (zclFrame.isClusterCommand())
     {
         if (zclFrame.frameControl() & deCONZ::ZclFCDirectionServerToClient)
@@ -101,7 +244,6 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
 
                 if (length > 1)
                 {
-                    
                     // skip Code lenght, use payload lenght instead
                     stream >> codeTemp;
                     length -= 1;
@@ -250,10 +392,14 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
     
     if (stateUpdated)
     {
-        sensorNode->updateStateTimestamp();
-        enqueueEvent(Event(RSensors, RStateLastUpdated, sensorNode->id()));
-        updateSensorEtag(&*sensorNode);
-        sensorNode->setNeedSaveDatabase(true);
+        sensor->updateStateTimestamp();
+        enqueueEvent(Event(RSensors, RStateLastUpdated, sensor->id()));
+    }
+
+    if (configUpdated || stateUpdated)
+    {
+        updateSensorEtag(&*sensor);
+        sensor->setNeedSaveDatabase(true);
         queSaveDb(DB_SENSORS, DB_SHORT_SAVE_DELAY);
     }
     
