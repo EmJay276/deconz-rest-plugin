@@ -180,7 +180,7 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                     }
 
                     // Update RStateDoorState Str value
-                    item = sensor->item(RStateDoorState);
+                    item = sensorNode->item(RStateDoorState);
                     if (item && item->toString() != str)
                     {
                         item->setValue(str);
