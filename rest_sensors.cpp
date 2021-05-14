@@ -2678,7 +2678,7 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
         {
             //delete the entry in the database
             QString data;
-            ResourceItem *item = sensorNode->item(RStatePin);
+            ResourceItem *item = sensor->item(RStatePin);
 
             if (item && !item->toString().isEmpty())
             {
@@ -2686,13 +2686,13 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
                 deletePinEntry(data,userID)
                 
                 item->setValue(data);
-                Event e(RSensors, RStatePin, sensorNode->id(), item);
+                Event e(RSensors, RStatePin, sensor->id(), item);
                 enqueueEvent(e);
 
-                sensorNode->updateStateTimestamp();
-                enqueueEvent(Event(RSensors, RStateLastUpdated, sensorNode->id()));
-                updateSensorEtag(&*sensorNode);
-                sensorNode->setNeedSaveDatabase(true);
+                sensor->updateStateTimestamp();
+                enqueueEvent(Event(RSensors, RStateLastUpdated, sensor->id()));
+                updateSensorEtag(&*sensor);
+                sensor->setNeedSaveDatabase(true);
                 queSaveDb(DB_SENSORS, DB_SHORT_SAVE_DELAY);
             }
             
