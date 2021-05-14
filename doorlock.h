@@ -20,6 +20,6 @@
 #define COMMAND_SET_PIN quint8(0x05)
 #define COMMAND_CLEAR_PIN quint8(0x07)
 
-void deletePinEntry(Sensor *sensorNode, quint16 userID);
+void deletePinEntry(QString &data, quint16 userID);
 
 #endif // DOORLOCK_H
