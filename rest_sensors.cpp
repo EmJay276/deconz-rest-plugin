@@ -2683,7 +2683,7 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
             if (item && !item->toString().isEmpty())
             {
                 data = item->toString();
-                deletePinEntry(data,userID)
+                deletePinEntry(data,userID);
                 
                 item->setValue(data);
                 Event e(RSensors, RStatePin, sensor->id(), item);
