@@ -8,13 +8,9 @@
  *
  */
  
-#include "de_web_plugin.h"
-#include "de_web_plugin_private.h"
- 
 #include "de_web_plugin_private.h"
 #include "json.h"
 #include "doorlock.h"
-
 
 const QStringList EventSourceList({"keypad","rf","manual","rfid"});
 const QStringList EventCodeList({
@@ -458,16 +454,8 @@ bool DeRestPluginPrivate::addTaskDoorLockPin(TaskItem &task, quint8 command, qui
     return addTask(task);
 }
 
-void deletePinEntry(Sensor *sensorNode, quint16 userID)
-{
-    //delete the entry in json if exist
-    QString data;
-    ResourceItem *item = sensorNode->item(RStatePin);
-
-    if (item && !item->toString().isEmpty())
-    {
-        data = item->toString();
-        
+void deletePinEntry(QString &data, quint16 userID)
+{       
         data = data.replace(QLatin1String("\\\""), QLatin1String("\""));
 
         //Transform qstring to json
@@ -494,18 +482,5 @@ void deletePinEntry(Sensor *sensorNode, quint16 userID)
 
         //Transform Json array to qstring
         data = Json::serialize(list2);
-
-        if (item)
-        {
-            item->setValue(data);
-            Event e(RSensors, RStatePin, sensorNode->id(), item);
-            enqueueEvent(e);
-
-            sensorNode->updateStateTimestamp();
-            enqueueEvent(Event(RSensors, RStateLastUpdated, sensorNode->id()));
-            updateSensorEtag(&*sensorNode);
-            sensorNode->setNeedSaveDatabase(true);
-            queSaveDb(DB_SENSORS, DB_SHORT_SAVE_DELAY);
-        }
     }
 }
