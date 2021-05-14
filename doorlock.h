@@ -13,6 +13,10 @@
 
 #include <sensor.h>
 
+#include "de_web_plugin.h"
+#include "de_web_plugin_private.h"
+#include "utils/utils.h"
+
 #define OPERATION_EVENT_NOTIFICATON quint8(0x20)
 #define PROGRAMMING_EVENT_NOTIFICATON quint8(0x21)
 

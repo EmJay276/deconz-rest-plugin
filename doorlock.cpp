@@ -11,9 +11,7 @@
 #include "de_web_plugin_private.h"
 #include "json.h"
 #include "doorlock.h"
-#include "de_web_plugin.h"
-#include "de_web_plugin_private.h"
-#include "utils/utils.h"
+
 
 const QStringList EventSourceList({"keypad","rf","manual","rfid"});
 const QStringList EventCodeList({
