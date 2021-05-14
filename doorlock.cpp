@@ -11,6 +11,7 @@
 #include "de_web_plugin_private.h"
 #include "json.h"
 #include "doorlock.h"
+#include "de_web_plugin_private.h"
 
 const QStringList EventSourceList({"keypad","rf","manual","rfid"});
 const QStringList EventCodeList({
@@ -496,7 +497,12 @@ void deletePinEntry(Sensor *sensorNode, quint16 userID)
             item->setValue(data);
             Event e(RSensors, RStatePin, sensorNode->id(), item);
             enqueueEvent(e);
-            stateUpdated = true;
+
+            sensorNode->updateStateTimestamp();
+            enqueueEvent(Event(RSensors, RStateLastUpdated, sensorNode->id()));
+            updateSensorEtag(&*sensorNode);
+            sensorNode->setNeedSaveDatabase(true);
+            queSaveDb(DB_SENSORS, DB_SHORT_SAVE_DELAY);
         }
     }
 }
