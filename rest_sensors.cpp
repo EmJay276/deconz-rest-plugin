@@ -2676,6 +2676,9 @@ int DeRestPluginPrivate::changeDoorLockPin(const ApiRequest &req, ApiResponse &r
     {        
         if (addTaskDoorLockPin(task, COMMAND_CLEAR_PIN, userID, map))
         {
+            //delete the entry in the database
+            deletePinEntry(sensor,userID)
+            
             rspItem["success"] = QString("/sensors/%1/state/pin delete user %2").arg(id).arg(userID);
             rsp.list.append(rspItem);
             correct = true;
