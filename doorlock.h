@@ -11,7 +11,7 @@
 #ifndef DOORLOCK_H
 #define DOORLOCK_H
 
-#include <deconz.h>
+#include <sensor.h>
 
 #define OPERATION_EVENT_NOTIFICATON quint8(0x20)
 #define PROGRAMMING_EVENT_NOTIFICATON quint8(0x21)
