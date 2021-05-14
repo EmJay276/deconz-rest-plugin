@@ -246,14 +246,10 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                         {
                             id = map["id"].toInt();
 
-                            if (id == userID)
+                            if (id != userID)
                             {
-                                map = nullptr;
+                                list2.append(map);
                             }
-                        }
-                        if (!map.isNull() )
-                        {
-                            list2.append(map);
                         }
                     }
          
