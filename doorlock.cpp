@@ -456,31 +456,30 @@ bool DeRestPluginPrivate::addTaskDoorLockPin(TaskItem &task, quint8 command, qui
 
 void deletePinEntry(QString &data, quint16 userID)
 {       
-        data = data.replace(QLatin1String("\\\""), QLatin1String("\""));
+    data = data.replace(QLatin1String("\\\""), QLatin1String("\""));
 
-        //Transform qstring to json
-        QVariant var = Json::parse(data);
-        QVariantList list = var.toList();
-        QVariantList list2;
+    //Transform qstring to json
+    QVariant var = Json::parse(data);
+    QVariantList list = var.toList();
+    QVariantList list2;
+    
+    quint16 id;
+    
+    foreach (const QVariant & v, list)
+    {
+        QVariantMap map = v.toMap();
         
-        quint16 id;
-        
-        foreach (const QVariant & v, list)
+        if (map["id"].type() == QVariant::Double)
         {
-            QVariantMap map = v.toMap();
-            
-            if (map["id"].type() == QVariant::Double)
-            {
-                id = map["id"].toInt();
+            id = map["id"].toInt();
 
-                if (id != userID)
-                {
-                    list2.append(map);
-                }
+            if (id != userID)
+            {
+                list2.append(map);
             }
         }
-
-        //Transform Json array to qstring
-        data = Json::serialize(list2);
     }
+
+    //Transform Json array to qstring
+    data = Json::serialize(list2);
 }
