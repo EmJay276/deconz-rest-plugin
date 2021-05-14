@@ -8,6 +8,9 @@
  *
  */
  
+#include "de_web_plugin.h"
+#include "de_web_plugin_private.h"
+ 
 #include "de_web_plugin_private.h"
 #include "json.h"
 #include "doorlock.h"
