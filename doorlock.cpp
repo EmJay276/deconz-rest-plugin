@@ -220,6 +220,55 @@ void DeRestPluginPrivate::handleDoorLockClusterIndication(const deCONZ::ApsDataI
                 stream >> status;
                 
                 DBG_Printf(DBG_INFO, "[Door lock] - Clear PIN command received, Status: %d\n", status);
+                
+                //delete the entry in json if exist
+                QString data;
+                ResourceItem *item = sensorNode->item(RStatePin);
+
+                if (item && !item->toString().isEmpty())
+                {
+                    data = item->toString();
+                    
+                    data = data.replace(QLatin1String("\\\""), QLatin1String("\""));
+
+                    //Transform qstring to json
+                    QVariant var = Json::parse(data);
+                    QVariantList list = var.toList();
+                    QVariantList list2;
+                    
+                    quint16 id;
+                    
+                    foreach (const QVariant & v, list)
+                    {
+                        QVariantMap map = v.toMap();
+                        
+                        if (map["id"].type() == QVariant::Double)
+                        {
+                            id = map["id"].toInt();
+
+                            if (id == userID)
+                            {
+                                map = nullptr;
+                            }
+                        }
+                        if (!map.isNull() )
+                        {
+                            list2.append(map);
+                        }
+                    }
+         
+                    //Transform Json array to qstring
+                    data = Json::serialize(list2);
+
+                    if (item)
+                    {
+                        item->setValue(data);
+                        Event e(RSensors, RStatePin, sensorNode->id(), item);
+                        enqueueEvent(e);
+                        stateUpdated = true;
+                    }
+                }
+                
             }
             else if (zclFrame.commandId() == COMMAND_READ_PIN)
             {
