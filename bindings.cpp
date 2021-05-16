@@ -3701,7 +3701,8 @@ bool DeRestPluginPrivate::checkSensorBindingsForClientClusters(Sensor *sensor)
         srcEndpoints.push_back(0x07);
         srcEndpoints.push_back(0x08);
     }
-    else if (sensor->modelId().startsWith(QLatin1String("ZGRC-TEUR-")))
+    else if (sensor->modelId().startsWith(QLatin1String("ZGRC-TEUR-")) ||
+             sensor->modelId() == QLatin1String("RemoteControl"))
     {
         clusters.push_back(ONOFF_CLUSTER_ID);
         clusters.push_back(LEVEL_CLUSTER_ID);

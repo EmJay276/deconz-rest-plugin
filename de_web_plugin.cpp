@@ -320,6 +320,7 @@ static const SupportedDevice supportedDevices[] = {
     { VENDOR_SUNRICHER, "ZG2835", silabs6MacPrefix }, // SR-ZG2835 Zigbee Rotary Switch
     { VENDOR_SUNRICHER, "ZGRC-TEUR-", emberMacPrefix }, // iluminize wall switch 511.524
     { VENDOR_SUNRICHER, "ZG2833PAC", silabs3MacPrefix}, // Sunricher Zigbee Push-Button Coupler SR-ZG2833PAC-C4
+    { VENDOR_PAULMANN, "RemoteControl", jennicMacPrefix}, // Paulmann ZigBee remote Control RGB GENT
     { VENDOR_JENNIC, "SPZB0001", jennicMacPrefix }, // Eurotronic thermostat
     { VENDOR_NONE, "RES001", tiMacPrefix }, // Hubitat environment sensor, see #1308
     { VENDOR_SINOPE, "WL4200S", sinopeMacPrefix}, // Sinope water sensor with wired remote sensor
@@ -4650,6 +4651,7 @@ void DeRestPluginPrivate::checkSensorButtonEvent(Sensor *sensor, const deCONZ::A
                     if (buttonMap.zclParam0 != sensor->previousDirection && // direction of previous move/step
                         (sensor->modelId().startsWith(QLatin1String("RGBgenie ZB-5121")) || // Device sends cmd = 7 + param = 0 for dim up/down
                         sensor->modelId().startsWith(QLatin1String("ZBT-DIMSwitch-D0001")) ||
+                        sensor->modelId().startsWith(QLatin1String("RemoteControl")) ||
                         sensor->modelId().startsWith(QLatin1String("ZGRC-TEUR-003"))))
                     {
                         sensor->previousDirection = 0xFF;
