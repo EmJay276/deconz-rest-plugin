@@ -8911,7 +8911,20 @@ void DeRestPluginPrivate::updateSensorNode(const deCONZ::NodeEvent &event)
                                 continue;
                             }
 
-                            if (ia->id() == 0x0005) // Model identifier
+                            if (ia->id() == 0x0001) // Application version as fallback for sw build id
+                            {
+                                QString str = ia->toString().simplified();
+
+                                if (!str.isEmpty() && i->swVersion().isEmpty() && str != i->swVersion())
+                                {
+                                    i->setSwVersion(str);
+                                    i->setNeedSaveDatabase(true);
+                                    pushSensorInfoToCore(&*i);
+                                    queSaveDb(DB_SENSORS, DB_LONG_SAVE_DELAY);
+                                    updateSensorEtag(&*i);
+                                }
+                            }
+                            else if (ia->id() == 0x0005) // Model identifier
                             {
                                 if (i->mustRead(READ_MODEL_ID))
                                 {
@@ -15987,8 +16000,16 @@ void DeRestPluginPrivate::delayedFastEnddeviceProbe(const deCONZ::NodeEvent *eve
                     node->nodeDescriptor().manufacturerCode() == VENDOR_CENTRALITE ||
                     !swBuildIdAvailable)
                 {
-                    DBG_Printf(DBG_INFO, "[4.1] Get date code\n");
-                    attributes.push_back(0x0006); // date code
+                    if (dateCode.isNull())
+                    {
+                        DBG_Printf(DBG_INFO, "[4.1] Get date code\n");
+                        attributes.push_back(0x0006); // date code
+                    }
+                    else
+                    {
+                        DBG_Printf(DBG_INFO, "[4.1] Get Application version\n");
+                        attributes.push_back(0x0001); // Application version
+                    }
                 }
                 else
                 {
