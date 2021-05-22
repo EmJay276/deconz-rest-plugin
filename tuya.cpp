@@ -930,18 +930,7 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                     break;
                     case 0x0170: // Reporting
                     {
-                        bool reporting = false;
-                        if (data == 1) { reporting = true; }
-
-                        ResourceItem *item = sensorNode->item(RConfigReporting);
-
-                        if (item && item->toBool() != reporting)
-                        {
-                            item->setValue(reporting);
-                            Event e(RSensors, RConfigReporting, sensorNode->id(), item);
-                            enqueueEvent(e);
-                            update = true;
-                        }
+                        DBG_Printf(DBG_INFO, "Tuya device 0x%016llX reporting status state : %ld\n", ind.srcAddress().ext(), data);
                     }
                     break;
                     case 0x0202: // Thermostat heatsetpoint
@@ -1381,6 +1370,19 @@ bool DeRestPluginPrivate::sendTuyaRequestThermostatSetWeeklySchedule(TaskItem &t
     }
 
     return sendTuyaRequest(taskRef, TaskThermostat, DP_TYPE_RAW, Dp_identifier, data);
+}
+
+
+bool DeRestPluginPrivate::sendTuyaRequest(quint64 srcAddress, quint8 srcEndpoint, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data)
+{
+    TaskItem task;
+
+    task.req.dstAddress() = srcAddress;
+    task.req.setDstAddressMode(deCONZ::ApsExtAddress);
+    task.req.setDstEndpoint(srcEndpoint);
+    task.req.setSrcEndpoint(endpoint());
+
+    return sendTuyaRequest(task, TaskTuyaRequest, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data);
 }
 
 //
