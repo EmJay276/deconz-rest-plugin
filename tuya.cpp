@@ -1373,7 +1373,7 @@ bool DeRestPluginPrivate::sendTuyaRequestThermostatSetWeeklySchedule(TaskItem &t
 }
 
 
-bool DeRestPluginPrivate::sendTuyaRequest(quint64 srcAddress, quint8 srcEndpoint, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data)
+bool DeRestPluginPrivate::sendTuyaRequest(deCONZ::Address srcAddress, quint8 srcEndpoint, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data)
 {
     TaskItem task;
 
