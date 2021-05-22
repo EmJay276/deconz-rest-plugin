@@ -1390,7 +1390,7 @@ bool DeRestPluginPrivate::sendTuyaRequest(deCONZ::Address srcAddress, quint8 src
     task.req.setDstEndpoint(srcEndpoint);
     task.req.setSrcEndpoint(endpoint());
 
-    return sendTuyaRequest(task, TaskTuyaRequest, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data);
+    return sendTuyaRequest(task, TaskTuyaRequest, Dp_type, Dp_identifier, data);
 }
 
 //
