@@ -265,6 +265,7 @@ void DeRestPluginPrivate::handleIasAceClusterIndication(const deCONZ::ApsDataInd
         
         //Update too the presence detection, this device have one, triger when you move front of it
         if (sensorNode->modelId() == QLatin1String("URC4450BC0-X-R") ||
+            sensorNode->modelId() == QLatin1String("1112-S") ||
             sensorNode->modelId() == QLatin1String("3405-L"))
         {
             Sensor *sensor2 = nullptr;
