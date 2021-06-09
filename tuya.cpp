@@ -358,6 +358,35 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                 break;
             }
         }
+        if (sensorNode && productId == QLatin1String("Smart air box"))
+        {
+            lightNode = nullptr;
+            switch (dp)
+            {
+                //temperature
+                case 0x0212:
+                {
+                    sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHATemperature"));
+                }
+                break;
+                //Humidity
+                case 0x0213:
+                {
+                    sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHAHumidity"));
+                }
+                break;
+                //Co2
+                case 0x0202:
+                {
+                    sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHACarbonMonoxide"));
+                }
+                break;
+                default:
+                {
+                }
+                break;
+            }
+        }
 
         if (lightNode)
         {
@@ -534,8 +563,9 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
         }
         else if (sensorNode)
         {
-            //Special part just for siren
-            if (productId == QLatin1String("NAS-AB02B0 Siren")) //siren
+            //Special part just for some devices
+            if (productId == QLatin1String("NAS-AB02B0 Siren") || // siren
+                productId == QLatin1String("Smart air box")) //smart air box
             {
                 switch (dp)
                 {
@@ -629,7 +659,22 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                         }
                     }
                     break;
+                    case 0x0202: // Smart air box Co2
+                    {
+                        qint16 co2 = static_cast<qint16>(data & 0xFFFF) * 10;
+                        ResourceItem *item = sensorNode->item(RStateCarbonMonoxide);
+
+                        if (item && item->toNumber() != co2)
+                        {
+                            item->setValue(co2);
+                            Event e(RSensors, RStateCarbonMonoxide, sensorNode->id(), item);
+                            enqueueEvent(e);
+                            update = true;
+                        }
+
+                    }
                     case 0x0269: // siren temperature
+                    case 0x0212: // Smart air box temperature
                     {
                         qint16 temp = static_cast<qint16>(data & 0xFFFF) * 10 + 200;
                         ResourceItem *item = sensorNode->item(RStateTemperature);
@@ -644,7 +689,8 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
 
                     }
                     break;
-                    case 0x026A : // Siren Humidity
+                    case 0x026A: // Siren Humidity
+                    case 0x0213: // smart air box humidity
                     {
                         qint16 Hum = static_cast<qint16>(data & 0xFFFF) * 100;
                         ResourceItem *item = sensorNode->item(RStateHumidity);

@@ -109,7 +109,7 @@ const quint64 silabs4MacPrefix    = 0x680ae20000000000ULL;
 const quint64 ecozyMacPrefix      = 0x70b3d50000000000ULL;
 const quint64 osramMacPrefix      = 0x8418260000000000ULL;
 const quint64 silabs5MacPrefix    = 0x842e140000000000ULL;
-const quint64 silabs10MacPrefix    = 0x8471270000000000ULL;
+const quint64 silabs10MacPrefix   = 0x8471270000000000ULL;
 const quint64 embertecMacPrefix   = 0x848e960000000000ULL;
 const quint64 YooksmartMacPrefix  = 0x84fd270000000000ULL;
 const quint64 silabsMacPrefix     = 0x90fd9f0000000000ULL;
@@ -120,6 +120,7 @@ const quint64 silabs2MacPrefix    = 0xcccccc0000000000ULL;
 const quint64 energyMiMacPrefix   = 0xd0cf5e0000000000ULL;
 const quint64 schlageMacPrefix    = 0xd0cf5e0000000000ULL;
 const quint64 bjeMacPrefix        = 0xd85def0000000000ULL;
+const quint64 silabs11MacPrefix   = 0xcc86ec0000000000ULL;
 const quint64 silabs3MacPrefix    = 0xec1bbd0000000000ULL;
 const quint64 onestiPrefix        = 0xf4ce360000000000ULL;
 const quint64 xalMacPrefix        = 0xf8f0050000000000ULL;
@@ -422,6 +423,7 @@ static const SupportedDevice supportedDevices[] = {
     { VENDOR_EMBER, "TS0202", ikea2MacPrefix }, // Tuya multi sensor
     { VENDOR_NONE, "0yu2xgi", silabs5MacPrefix }, // Tuya siren
     { VENDOR_EMBER, "TS0601", silabs9MacPrefix }, // Tuya siren
+    { VENDOR_EMBER, "TS0601", silabs11MacPrefix }, // Tuya smart air box
     { VENDOR_EMBER, "TS0222", silabs9MacPrefix }, // TYZB01 light sensor 
     { VENDOR_NONE, "eaxp72v", ikea2MacPrefix }, // Tuya TRV Wesmartify Thermostat Essentials Premium
     { VENDOR_NONE, "88teujp", silabs8MacPrefix }, // SEA802-Zigbee
@@ -5252,7 +5254,7 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                         {
                             fpThermostatSensor.inClusters.push_back(TUYA_CLUSTER_ID);
                         }
-                        if (manufacturer.endsWith(QLatin1String("0yu2xgi")))
+                        if (manufacturer.endsWith(QLatin1String("0yu2xgi"))) // Tuya Siren
                         {
                             fpTemperatureSensor.inClusters.push_back(TUYA_CLUSTER_ID);
                             fpTemperatureSensor.inClusters.push_back(TEMPERATURE_MEASUREMENT_CLUSTER_ID);
@@ -5260,6 +5262,17 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                             fpHumiditySensor.inClusters.push_back(RELATIVE_HUMIDITY_CLUSTER_ID);
                             fpAlarmSensor.inClusters.push_back(TUYA_CLUSTER_ID);
                             fpAlarmSensor.inClusters.push_back(IAS_ZONE_CLUSTER_ID);
+                        }
+                        if (manufacturer.endsWith(QLatin1String("ygsuhe1"))) // Tuya Smart Air Box
+                        {
+                            fpTemperatureSensor.inClusters.push_back(TUYA_CLUSTER_ID);
+                            fpTemperatureSensor.inClusters.push_back(TEMPERATURE_MEASUREMENT_CLUSTER_ID);
+                            fpHumiditySensor.inClusters.push_back(TUYA_CLUSTER_ID);
+                            fpHumiditySensor.inClusters.push_back(RELATIVE_HUMIDITY_CLUSTER_ID);
+                            fpAlarmSensor.inClusters.push_back(TUYA_CLUSTER_ID);
+                            fpAlarmSensor.inClusters.push_back(IAS_ZONE_CLUSTER_ID);
+                            fpCarbonMonoxideSensor.push_back(TUYA_CLUSTER_ID);
+                            fpCarbonMonoxideSensor.push_back(IAS_ZONE_CLUSTER_ID);
                         }
                     }
                     else if (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER &&
