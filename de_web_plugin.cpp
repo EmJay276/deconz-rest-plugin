@@ -5271,8 +5271,7 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                             fpHumiditySensor.inClusters.push_back(RELATIVE_HUMIDITY_CLUSTER_ID);
                             fpAlarmSensor.inClusters.push_back(TUYA_CLUSTER_ID);
                             fpAlarmSensor.inClusters.push_back(IAS_ZONE_CLUSTER_ID);
-                            fpCarbonMonoxideSensor.push_back(TUYA_CLUSTER_ID);
-                            fpCarbonMonoxideSensor.push_back(IAS_ZONE_CLUSTER_ID);
+                            fpAirQualitySensor.inClusters.push_back(TUYA_CLUSTER_ID);
                         }
                     }
                     else if (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER &&
@@ -6466,6 +6465,7 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
 
         // ZHAAirQuality
         if (fpAirQualitySensor.hasInCluster(DEVELCO_AIR_QUALITY_CLUSTER_ID)   // Develco specific -> VOC Management
+            || fpAirQualitySensor.hasInCluster(TUYA_CLUSTER_ID) // Tuya Smart air box
             || fpAirQualitySensor.hasInCluster(BOSCH_AIR_QUALITY_CLUSTER_ID)) // Bosch Air quality sensor
         {
             fpAirQualitySensor.endpoint = i->endpoint();

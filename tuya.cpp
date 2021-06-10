@@ -378,7 +378,13 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                 //Co2
                 case 0x0202:
                 {
-                    sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHACarbonMonoxide"));
+                    //sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHACarbonMonoxide"));
+                }
+                break;
+                //VOC 
+                case 0x0215:
+                {
+                    sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHAAirQuality"));
                 }
                 break;
                 default:
@@ -673,10 +679,17 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                         }
 
                     }
+                    break;
                     case 0x0269: // siren temperature
                     case 0x0212: // Smart air box temperature
                     {
-                        qint16 temp = static_cast<qint16>(data & 0xFFFF) * 10 + 200;
+                        qint16 temp = static_cast<qint16>(data & 0xFFFF) * 10;
+                        
+                        if (productId == QLatin1String("NAS-AB02B0 Siren")
+                        {
+                            temp = temp + 200;
+                        }
+                        
                         ResourceItem *item = sensorNode->item(RStateTemperature);
 
                         if (item && item->toNumber() != temp)
@@ -699,6 +712,20 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                         {
                             item->setValue(Hum);
                             Event e(RSensors, RStateHumidity, sensorNode->id(), item);
+                            enqueueEvent(e);
+                            update = true;
+                        }
+                    }
+                    break;
+                    case 0x0215: // VOC
+                    {
+                        qint16 voc = static_cast<qint16>(data & 0xFFFF);
+                        ResourceItem *item = sensorNode->item(RStateAirQualityPpb);
+
+                        if (item && item->toNumber() != voc)
+                        {
+                            item->setValue(voc);
+                            Event e(RSensors, RStateAirQualityPpb, sensorNode->id(), item);
                             enqueueEvent(e);
                             update = true;
                         }
