@@ -5269,8 +5269,6 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                             fpTemperatureSensor.inClusters.push_back(TEMPERATURE_MEASUREMENT_CLUSTER_ID);
                             fpHumiditySensor.inClusters.push_back(TUYA_CLUSTER_ID);
                             fpHumiditySensor.inClusters.push_back(RELATIVE_HUMIDITY_CLUSTER_ID);
-                            fpAlarmSensor.inClusters.push_back(TUYA_CLUSTER_ID);
-                            fpAlarmSensor.inClusters.push_back(IAS_ZONE_CLUSTER_ID);
                             fpAirQualitySensor.inClusters.push_back(TUYA_CLUSTER_ID);
                         }
                     }
@@ -7132,6 +7130,12 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const SensorFi
             // Init Poll control
             item = sensorNode.addItem(DataTypeUInt16, RConfigPending);
             item->setValue(item->toNumber() | R_PENDING_WRITE_POLL_CHECKIN_INTERVAL | R_PENDING_SET_LONG_POLL_INTERVAL);
+        }
+        else if (sensorNode.fingerPrint().hasInCluster(TUYA_CLUSTER_ID))
+        {
+            clusterId = TUYA_CLUSTER_ID;
+            item = sensorNode.addItem(DataTypeString, RStateAirQuality);
+            item = sensorNode.addItem(DataTypeUInt16, RStateAirQualityPpb);
         }
 
         if (modelId == QLatin1String("AQSZB-110")  // Develco air quality sensor

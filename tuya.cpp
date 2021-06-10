@@ -347,6 +347,7 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                 //Humidity
                 case 0x026A:
                 {
+                    DBG_Printf(DBG_INFO, "Tuya debug Humidity : 1");
                     sensorNode = getSensorNodeForAddressAndEndpoint(ind.srcAddress(), ind.srcEndpoint(), QLatin1String("ZHAHumidity"));
                 }
                 break;
@@ -685,7 +686,7 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                     {
                         qint16 temp = static_cast<qint16>(data & 0xFFFF) * 10;
                         
-                        if (productId == QLatin1String("NAS-AB02B0 Siren")
+                        if (productId == QLatin1String("NAS-AB02B0 Siren"))
                         {
                             temp = temp + 200;
                         }
@@ -705,12 +706,14 @@ void DeRestPluginPrivate::handleTuyaClusterIndication(const deCONZ::ApsDataIndic
                     case 0x026A: // Siren Humidity
                     case 0x0213: // smart air box humidity
                     {
-                        qint16 Hum = static_cast<qint16>(data & 0xFFFF) * 100;
+                        DBG_Printf(DBG_INFO, "Tuya debug Humidity : 2");
+                        qint16 hum = static_cast<qint16>(data & 0xFFFF) * 100;
                         ResourceItem *item = sensorNode->item(RStateHumidity);
 
-                        if (item && item->toNumber() != Hum)
+                        if (item && item->toNumber() != hum)
                         {
-                            item->setValue(Hum);
+                            DBG_Printf(DBG_INFO, "Tuya debug Humidity : 3");
+                            item->setValue(hum);
                             Event e(RSensors, RStateHumidity, sensorNode->id(), item);
                             enqueueEvent(e);
                             update = true;
