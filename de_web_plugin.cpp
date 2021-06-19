@@ -5264,6 +5264,11 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                             fpAlarmSensor.inClusters.push_back(TUYA_CLUSTER_ID);
                             fpAlarmSensor.inClusters.push_back(IAS_ZONE_CLUSTER_ID);
                         }
+                        if (manufacturer.endsWith(QLatin1String("aaysllp")))
+                        {
+                            fpTemperatureSensor.inClusters.push_back(TEMPERATURE_MEASUREMENT_CLUSTER_ID);
+                            fpHumiditySensor.inClusters.push_back(RELATIVE_HUMIDITY_CLUSTER_ID);
+                        }
                     }
                     else if (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER &&
                              (manufacturer.endsWith(QLatin1String("oclfnxz")) ||
@@ -6179,6 +6184,11 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
             fpTemperatureSensor.endpoint = i->endpoint();
             fpTemperatureSensor.deviceId = i->deviceId();
             fpTemperatureSensor.profileId = i->profileId();
+            
+            if (manufacturer.endsWith(QLatin1String("aaysllp")))
+            {
+                fpTemperatureSensor.endpoint = 0x02;
+            }
 
             sensor = getSensorNodeForFingerPrint(node->address().ext(), fpTemperatureSensor, "ZHATemperature");
             if (!sensor || sensor->deletedState() != Sensor::StateNormal)
@@ -6215,6 +6225,11 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
             fpHumiditySensor.endpoint = i->endpoint();
             fpHumiditySensor.deviceId = i->deviceId();
             fpHumiditySensor.profileId = i->profileId();
+            
+            if (manufacturer.endsWith(QLatin1String("aaysllp")))
+            {
+                fpTemperatureSensor.endpoint = 0x02;
+            }
 
             sensor = getSensorNodeForFingerPrint(node->address().ext(), fpHumiditySensor, "ZHAHumidity");
             if (!sensor || sensor->deletedState() != Sensor::StateNormal)
