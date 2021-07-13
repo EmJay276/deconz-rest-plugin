@@ -4245,6 +4245,7 @@ void DeRestPluginPrivate::checkSensorButtonEvent(Sensor *sensor, const deCONZ::A
     {
         // useful in general but limit scope to known problematic devices
         if (isTuyaManufacturerName(sensor->manufacturer()) ||
+            sensor->modelId() == QLatin1String("SYMFONISK") ||
             // TODO "HG06323" can likely be removed after testing,
             // since the device only sends group casts and we don't expect this to trigger.
             sensor->modelId() == QLatin1String("HG06323"))
