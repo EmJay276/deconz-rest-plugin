@@ -25,7 +25,7 @@
 #include "aps_controller_wrapper.h"
 #include "resource.h"
 #include "daylight.h"
-#include "event.h"
+#include "event_emitter.h"
 #include "green_power.h"
 #include "resource.h"
 #include "rest_node_base.h"
@@ -218,7 +218,6 @@ using namespace deCONZ::literals;
 #define DEVELCO_AIR_QUALITY_CLUSTER_ID        0xFC03
 #define SENGLED_CLUSTER_ID                    0xFC10
 #define LEGRAND_CONTROL_CLUSTER_ID            0xFC40
-#define XIAOMI_CLUSTER_ID                     0xFCC0
 #define ADUROLIGHT_CLUSTER_ID                 0xFCCC
 #define XAL_CLUSTER_ID                        0xFCCE
 #define BOSCH_AIR_QUALITY_CLUSTER_ID          quint16(0xFDEF)
@@ -348,6 +347,7 @@ using namespace deCONZ::literals;
 #define VENDOR_DDEL                 0x1135
 #define VENDOR_WAXMAN               0x113B
 #define VENDOR_OWON                 0x113C
+#define VENDOR_TUYA                 0x1141
 #define VENDOR_LUTRON               0x1144
 #define VENDOR_BOSCH2               0x1155
 #define VENDOR_ZEN                  0x1158
@@ -371,6 +371,7 @@ using namespace deCONZ::literals;
 #define VENDOR_MUELLER              0x121B // Used by Mueller Licht
 #define VENDOR_AURORA               0x121C // Used by Aurora Aone
 #define VENDOR_SUNRICHER            0x1224 // white label used by iCasa, Illuminize, Namron, SLC ...
+#define VENDOR_XIAOYAN              0x1228
 #define VENDOR_XAL                  0x122A
 #define VENDOR_ADUROLIGHT           0x122D
 #define VENDOR_THIRD_REALITY        0x1233
@@ -381,6 +382,7 @@ using namespace deCONZ::literals;
 #define VENDOR_NIKO_NV              0x125F
 #define VENDOR_KONKE                0x1268
 #define VENDOR_SHYUGJ_TECHNOLOGY    0x126A
+#define VENDOR_ADEO                 0x1277
 #define VENDOR_XIAOMI2              0x126E
 #define VENDOR_DATEK                0x1337
 #define VENDOR_OSRAM_STACK          0xBBAA
@@ -522,6 +524,7 @@ extern const quint64 konkeMacPrefix;
 extern const quint64 ecozyMacPrefix;
 extern const quint64 zhejiangMacPrefix;
 extern const quint64 schlageMacPrefix;
+extern const quint64 lumiMacPrefix;
 
 inline bool existDevicesWithVendorCodeForMacPrefix(quint64 addr, quint16 vendor)
 {
@@ -529,7 +532,8 @@ inline bool existDevicesWithVendorCodeForMacPrefix(quint64 addr, quint16 vendor)
     switch (vendor) {
         case VENDOR_XIAOMI:
             return prefix == jennicMacPrefix ||
-                   prefix == xiaomiMacPrefix;
+                   prefix == xiaomiMacPrefix ||
+                   prefix == lumiMacPrefix;
         case VENDOR_SINOPE:
             return prefix == sinopeMacPrefix;
         case VENDOR_HEIMAN:
@@ -541,6 +545,10 @@ inline bool existDevicesWithVendorCodeForMacPrefix(quint64 addr, quint16 vendor)
                    prefix == silabs6MacPrefix;
         case VENDOR_3A_SMART_HOME:
             return prefix == jennicMacPrefix;
+        case VENDOR_ADEO:
+            return prefix == emberMacPrefix ||
+                   prefix == silabs9MacPrefix ||
+                   prefix == konkeMacPrefix;
         case VENDOR_ALERTME:
             return prefix == tiMacPrefix ||
                    prefix == computimeMacPrefix;
@@ -1370,9 +1378,7 @@ public Q_SLOTS:
     void checkSensorStateTimerFired();
 
     // events
-    void initEventQueue();
-    void eventQueueTimerFired();
-    void enqueueEvent(const Event &event);
+    void handleEvent(const Event &e);
 
     // firmware update
     void initFirmwareUpdate();
@@ -1544,11 +1550,11 @@ public:
     void sendArmResponse(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame, quint8 armMode);
     void handleIndicationSearchSensors(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame);
     bool sendTuyaRequest(TaskItem &task, TaskType taskType, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data);
+    bool sendTuyaRequest(deCONZ::Address srcAddress, quint8 srcEndpoint, qint8 Dp_type, qint8 Dp_identifier, const QByteArray &data);
     bool sendDoubleTuyaRequest(TaskItem &task, TaskType taskType, qint8 Dp_type1, qint8 Dp_identifier1, const QByteArray &data1, qint8 Dp_type2, qint8 Dp_identifier2, const QByteArray &data2);
     bool sendTuyaCommand(const deCONZ::ApsDataIndication &ind, qint8 commandId, const QByteArray &data);
     void handleCommissioningClusterIndication(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame);
     bool sendTuyaRequestThermostatSetWeeklySchedule(TaskItem &taskRef, quint8 weekdays, const QString &transitions, qint8 Dp_identifier);
-    void handleZdpIndication(const deCONZ::ApsDataIndication &ind);
     bool handleMgmtBindRspConfirm(const deCONZ::ApsDataConfirm &conf);
     void handleDeviceAnnceIndication(const deCONZ::ApsDataIndication &ind);
     void handleNodeDescriptorResponseIndication(const deCONZ::ApsDataIndication &ind);
@@ -1588,6 +1594,9 @@ public:
     bool deserialiseThermostatSchedule(const QString &s, QVariantMap *schedule);
     void handleSimpleMeteringClusterIndication(const deCONZ::ApsDataIndication &ind, const deCONZ::ZclFrame &zclFrame);
     void handleElectricalMeasurementClusterIndication(const deCONZ::ApsDataIndication &ind, const deCONZ::ZclFrame &zclFrame);
+    void handleXiaoyanClusterIndication(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame);
+    void handleXiaomiLumiClusterIndication(const deCONZ::ApsDataIndication &ind, deCONZ::ZclFrame &zclFrame);
+    void handleOccupancySensingClusterIndication(const deCONZ::ApsDataIndication &ind, const deCONZ::ZclFrame &zclFrame);
 
     // Modify node attributes
     void setAttributeOnOff(LightNode *lightNode);
@@ -1614,6 +1623,7 @@ public:
     bool upgradeDbToUserVersion2();
     bool upgradeDbToUserVersion6();
     bool upgradeDbToUserVersion7();
+    bool upgradeDbToUserVersion8();
     void refreshDeviceDb(const deCONZ::Address &addr);
     void pushZdpDescriptorDb(quint64 extAddress, quint8 endpoint, quint16 type, const QByteArray &data);
     void pushZclValueDb(quint64 extAddress, quint8 endpoint, quint16 clusterId, quint16 attributeId, qint64 data);
@@ -2096,8 +2106,7 @@ public:
     uint8_t haEndpoint;
 
     // events
-    QTimer *eventTimer;
-    std::deque<Event> eventQueue;
+    EventEmitter *eventEmitter = nullptr;
 
     // bindings
     size_t verifyRuleIter;
