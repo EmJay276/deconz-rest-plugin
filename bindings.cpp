@@ -1781,6 +1781,7 @@ bool DeRestPluginPrivate::sendConfigureReportingRequest(BindingTask &bt)
                  modelId == QLatin1String("ISW-ZPR1-WP13") ||
                  modelId == QLatin1String("SLT2") ||
                  modelId == QLatin1String("TS0202") || // Tuya sensor
+                 modelId == QLatin1String("TS0203") || // Tuya sensor
                  modelId == QLatin1String("3AFE14010402000D") || // Konke presence sensor
                  modelId == QLatin1String("3AFE28010402000D") || // Konke presence sensor
                  modelId.startsWith(QLatin1String("GZ-PIR02")) ||          // Sercomm motion sensor
@@ -2941,6 +2942,7 @@ bool DeRestPluginPrivate::checkSensorBindingsForAttributeReporting(Sensor *senso
         sensor->modelId().startsWith(QLatin1String("TS02")) ||
         sensor->modelId().startsWith(QLatin1String("TS03")) ||
         sensor->modelId().startsWith(QLatin1String("TS0202")) || // motion sensor, manu = _TYZB01_zwvaj5wy
+        sensor->modelId().startsWith(QLatin1String("TS0203")) ||
         sensor->modelId().startsWith(QLatin1String("TS0043")) || // to test
         sensor->modelId().startsWith(QLatin1String("TS0041")) ||
         sensor->modelId().startsWith(QLatin1String("TS0044")) ||
@@ -3226,6 +3228,7 @@ bool DeRestPluginPrivate::checkSensorBindingsForAttributeReporting(Sensor *senso
                      sensor->modelId().startsWith(QLatin1String("3AFE14010402000D")) || //konke presence sensor
                      sensor->modelId().startsWith(QLatin1String("3AFE28010402000D")) || //konke presence sensor
                      sensor->modelId().startsWith(QLatin1String("TS0202")) || //Tuya presence sensor
+                     sensor->modelId().startsWith(QLatin1String("TS0203")) || //Tuya door sensor
                      sensor->modelId().endsWith(QLatin1String("86opcn01")) || // Aqara Opple
                      sensor->modelId() == QLatin1String("lumi.motion.agl04") || // Xiaomi Aqara RTCGQ13LM high precision motion sensor
                      sensor->modelId().startsWith(QLatin1String("1116-S")) ||

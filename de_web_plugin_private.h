@@ -500,6 +500,7 @@ extern const quint64 silabs7MacPrefix;
 extern const quint64 silabs8MacPrefix;
 extern const quint64 silabs9MacPrefix;
 extern const quint64 silabs10MacPrefix;
+extern const quint64 silabs11MacPrefix;
 extern const quint64 instaMacPrefix;
 extern const quint64 boschMacPrefix;
 extern const quint64 jennicMacPrefix;

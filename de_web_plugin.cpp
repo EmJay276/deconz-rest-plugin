@@ -120,6 +120,7 @@ const quint64 silabsMacPrefix     = 0x90fd9f0000000000ULL;
 const quint64 zhejiangMacPrefix   = 0xb0ce180000000000ULL;
 const quint64 silabs7MacPrefix    = 0xbc33ac0000000000ULL;
 const quint64 dlinkMacPrefix      = 0xc4e90a0000000000ULL;
+const quint64 silabs11MacPrefix   = 0xcc86ec0000000000ULL;
 const quint64 silabs2MacPrefix    = 0xcccccc0000000000ULL;
 const quint64 energyMiMacPrefix   = 0xd0cf5e0000000000ULL;
 const quint64 schlageMacPrefix    = 0xd0cf5e0000000000ULL;
@@ -430,6 +431,7 @@ static const SupportedDevice supportedDevices[] = {
     { VENDOR_EMBER, "TS0207", silabs3MacPrefix }, // Tuya water leak sensor
     { VENDOR_NONE, "TS0202", silabs4MacPrefix }, // Tuya presence sensor
     { VENDOR_EMBER, "TS0202", ikea2MacPrefix }, // Tuya multi sensor
+    { VENDOR_EMBER, "TS0203", silabs11MacPrefix }, // Tuya door sensor TEEKAR
     { VENDOR_NONE, "0yu2xgi", silabs5MacPrefix }, // Tuya siren
     { VENDOR_EMBER, "TS0601", silabs9MacPrefix }, // Tuya siren
     { VENDOR_EMBER, "TS0222", silabs9MacPrefix }, // TYZB01 light sensor
@@ -5460,6 +5462,7 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                              modelId == QLatin1String("GMB-HAS-DW-B01") ||                      // GamaBit Ltd. Window/Door Sensor
                              modelId == QLatin1String("TY0203") ||                              // lidl / SilverCrest
                              modelId == QLatin1String("DCH-B112") ||                            // D-Link door/window sensor
+                             manufacturer.endsWith(QLatin1String("mg14ax2")) ||                  // Tuya TEEKAR door sensor
                              modelId == QLatin1String("RH3001"))                                // Tuya/Blitzwolf BW-IS2 door/window sensor
                     {
                         fpOpenCloseSensor.inClusters.push_back(ci->id());
