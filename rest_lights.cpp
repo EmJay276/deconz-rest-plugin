@@ -2095,7 +2095,14 @@ int DeRestPluginPrivate::setTuyaDeviceState(const ApiRequest &req, ApiResponse &
             data2.append((qint8)((onTime >> 16) & 0xff));
             data2.append((qint8)((onTime >> 8) & 0xff));
             data2.append((qint8)(onTime & 0xff));
-            ok = sendDoubleTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_ONTIME, data2, DP_TYPE_BOOL, button, data);
+            if (R_GetProductId(taskRef.lightNode) == QLatin1String("Tuya_OTH ZVG1"))
+            {
+                ok = sendDoubleTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_ONTIME2, data2, DP_TYPE_BOOL, button, data);
+            }
+            else
+            {
+                ok = sendDoubleTuyaRequest(taskRef, TaskTuyaRequest, DP_TYPE_VALUE, DP_IDENTIFIER_ONTIME1, data2, DP_TYPE_BOOL, button, data);
+            }
         }
         else
         {

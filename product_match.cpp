@@ -97,6 +97,7 @@ static const ProductMap products[] =
     {"_TZ3210_rxqls8v0", "TS0202", "Fantem", "Tuya_SEN Multi-sensor"},
     {"_TZ3210_zmy9hjay", "TS0202", "Fantem", "Tuya_SEN Multi-sensor"},
     {"_TZE200_htnnfasr", "TS0601", "PARKSIDE", "Tuya_OTH PSBZS A1"},
+    {"_TZE200_akjefhj5", "TS0601", "RTX", "Tuya_OTH ZVG1"},
 
      // Switch
     {"_TZE200_la2c2uo9", "TS0601", "Moes", "Tuya_DIMSWITCH MS-105Z"},
