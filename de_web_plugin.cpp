@@ -2424,7 +2424,8 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
             {
                 hasServerOnOff = false;
             }
-            if (R_GetProductId(&lightNode).startsWith(QLatin1String("Tuya_COVD")) || //Battery covering
+            if (R_GetProductId(&lightNode).startsWith(QLatin1String("Tuya_COVD")) || // Battery covering
+                R_GetProductId(&lightNode) == QLatin1String("Tuya_OTH ZVG1") ||      // Water valve
                 R_GetProductId(&lightNode) == QLatin1String("NAS-AB02B0 Siren"))     // Tuya siren
             {
                 hasServerOnOff = true;
@@ -5883,6 +5884,7 @@ void DeRestPluginPrivate::addSensorNode(const deCONZ::Node *node, const deCONZ::
                     }
                     if (manufacturer == QLatin1String("_TZE200_xuzcvlku") ||
                         manufacturer == QLatin1String("_TZE200_zah67ekd") ||
+                        manufacturer == QLatin1String("_TZE200_akjefhj5") ||
                         manufacturer == QLatin1String("_TZE200_rddyvrci"))
                     {
                         fpBatterySensor.inClusters.push_back(TUYA_CLUSTER_ID);
