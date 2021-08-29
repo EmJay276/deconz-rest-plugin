@@ -2157,6 +2157,8 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
 
     bool hasTuyaCluster = false;
     QString manufacturer;
+    
+    DBG_Printf(DBG_INFO, "Tuya debug 777\n");
 
     //Make 2 fakes device for tuya switches
     if (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER && !node->simpleDescriptors().empty())
@@ -2357,10 +2359,14 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
         lightNode.setNode(const_cast<deCONZ::Node*>(node));
         lightNode.address() = node->address();
         lightNode.setManufacturerCode(node->nodeDescriptor().manufacturerCode());
+        
+        DBG_Printf(DBG_INFO, "Tuya debug 888\n");
 
         // For Tuya, we realy need manufacture Name, but can't use it to compare because of fonction setManufacturerCode() that put "Heiman",
         if (node->nodeDescriptor().isNull() || node->simpleDescriptors().empty())
-        { }
+        {
+            DBG_Printf(DBG_INFO, "Tuya debug 666\n");
+        }
         else if (node->nodeDescriptor().manufacturerCode() == VENDOR_NONE || (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER))
         {
             if (manufacturer.isEmpty())
@@ -2389,6 +2395,7 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
             }
             if (!manufacturer.isEmpty())
             {
+                DBG_Printf(DBG_INFO, "Tuya debug 999\n");
                 lightNode.setManufacturerName(manufacturer);
                 lightNode.setNeedSaveDatabase(true);
             }
