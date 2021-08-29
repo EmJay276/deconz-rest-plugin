@@ -2125,11 +2125,16 @@ void DeRestPluginPrivate::handleMacDataRequest(const deCONZ::NodeEvent &event)
  */
 void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
 {
+    DBG_Printf(DBG_INFO_L2, "Tuya debug 111\n");
+    
     DBG_Assert(node != nullptr);
     if (!node)
     {
         return;
     }
+    
+    DBG_Printf(DBG_INFO_L2, "Tuya debug 777 : adress 0x%016llx\n", node->address().ext());
+    
     if (node->nodeDescriptor().manufacturerCode() == VENDOR_KEEN_HOME || // Keen Home Vent
         node->nodeDescriptor().manufacturerCode() == VENDOR_JENNIC || // Xiaomi lumi.ctrl_neutral1, lumi.ctrl_neutral2
         node->nodeDescriptor().manufacturerCode() == VENDOR_XIAOMI || // Xiaomi lumi.curtain.hagl04
@@ -2157,8 +2162,6 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
 
     bool hasTuyaCluster = false;
     QString manufacturer;
-    
-    DBG_Printf(DBG_INFO, "Tuya debug 777\n");
 
     //Make 2 fakes device for tuya switches
     if (node->nodeDescriptor().manufacturerCode() == VENDOR_EMBER && !node->simpleDescriptors().empty())
@@ -2360,7 +2363,7 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
         lightNode.address() = node->address();
         lightNode.setManufacturerCode(node->nodeDescriptor().manufacturerCode());
         
-        DBG_Printf(DBG_INFO, "Tuya debug 888\n");
+        DBG_Printf(DBG_INFO_L2, "Tuya debug 888 : adress 0x%016llx\n", node->address().ext() );
 
         // For Tuya, we realy need manufacture Name, but can't use it to compare because of fonction setManufacturerCode() that put "Heiman",
         if (node->nodeDescriptor().isNull() || node->simpleDescriptors().empty())
@@ -2399,6 +2402,10 @@ void DeRestPluginPrivate::addLightNode(const deCONZ::Node *node)
                 lightNode.setManufacturerName(manufacturer);
                 lightNode.setNeedSaveDatabase(true);
             }
+        }
+        else
+        {
+            DBG_Printf(DBG_INFO_L2, "Tuya debug 222 : manu code 0x%04X\n", node->nodeDescriptor().manufacturerCode() );
         }
 
         //VENDOR_NONE only use device with 2 cluster ? or perhaps VENDOR_EMBER too
