@@ -2448,6 +2448,9 @@ void DeRestPluginPrivate::checkLightBindingsForAttributeReporting(LightNode *lig
         else if (lightNode->manufacturerCode() == VENDOR_EMBER)
         {
         }
+        else if (lightNode->manufacturerCode() == VENDOR_TUYA)
+        {
+        }
         else if (lightNode->manufacturerCode() == VENDOR_LGE)
         {
         }
