@@ -259,6 +259,7 @@ void DeRestPluginPrivate::handlePowerConfigurationClusterIndication(const deCONZ
                     sensor.modelId().startsWith(QLatin1String("GZ-PIR02"))   || // Sercomm motion sensor
                     sensor.modelId() == QLatin1String("URC4450BC0-X-R")   || // Xfinity Keypad XHK1-UE
                     sensor.modelId() == QLatin1String("3405-L") ||           // IRIS 3405-L Keypad
+                    sensor.modelId() == QLatin1String("KEPZB-110") ||        // Frient intelligente KeyPad
                     sensor.modelId().startsWith(QLatin1String("Tripper")) || // Quirky Tripper (Sercomm) open/close
                     sensor.modelId().startsWith(QLatin1String("Lightify Switch Mini")) ||  // Osram 3 button remote
                     sensor.modelId().startsWith(QLatin1String("Switch 4x EU-LIGHTIFY")) || // Osram 4 button remote

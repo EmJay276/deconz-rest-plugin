@@ -2963,7 +2963,7 @@ bool DeRestPluginPrivate::checkSensorBindingsForAttributeReporting(Sensor *senso
         sensor->modelId() == QLatin1String("PoP") ||
         // Bitron
         sensor->modelId().startsWith(QLatin1String("902010")) ||
-        // Develco
+        // Develco / Frient
         sensor->modelId().startsWith(QLatin1String("AQSZB-1")) ||   // air quality sensor
         sensor->modelId().startsWith(QLatin1String("SMSZB-1")) ||   // smoke sensor
         sensor->modelId().startsWith(QLatin1String("HESZB-1")) ||   // heat sensor
@@ -2980,6 +2980,7 @@ bool DeRestPluginPrivate::checkSensorBindingsForAttributeReporting(Sensor *senso
         sensor->modelId().startsWith(QLatin1String("HMSZB-1")) ||   // temp/hum sensor
         sensor->modelId() == QLatin1String("MotionSensor51AU") ||   // Aurora (Develco) motion sensor
         sensor->modelId() == QLatin1String("Smart16ARelay51AU") ||  // Aurora (Develco) smart plug
+        sensor->modelId() == QLatin1String("KEPZB-110") ||          // Frient intelligente KeyPad
         // LG
         sensor->modelId() == QLatin1String("LG IP65 HMS") ||
         // Sinope
@@ -3943,6 +3944,7 @@ bool DeRestPluginPrivate::checkSensorBindingsForClientClusters(Sensor *sensor)
              sensor->modelId().startsWith(QLatin1String("RC-EM")) ||
              sensor->modelId() == QLatin1String("URC4450BC0-X-R") ||
              sensor->modelId() == QLatin1String("3405-L") ||
+             sensor->modelId() == QLatin1String("KEPZB-110") ||
              sensor->modelId().startsWith(QLatin1String("RC-EF-3.0")))
     {
         clusters.push_back(IAS_ACE_CLUSTER_ID);

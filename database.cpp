@@ -4104,6 +4104,7 @@ static int sqliteLoadAllSensorsCallback(void *user, int ncols, char **colval , c
         if (sensor.fingerPrint().hasInCluster(IAS_ZONE_CLUSTER_ID) &&
            (sensor.modelId() != QLatin1String("URC4450BC0-X-R") ||
             sensor.modelId() != QLatin1String("3405-L") ||
+            sensor.modelId() != QLatin1String("KEPZB-110") ||
            (sensor.type().endsWith(QLatin1String("AncillaryControl")) || !sensor.fingerPrint().hasOutCluster(IAS_ACE_CLUSTER_ID))))
         {
             if (sensor.modelId() == QLatin1String("button") ||
