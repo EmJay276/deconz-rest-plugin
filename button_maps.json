@@ -1047,9 +1047,9 @@
                 [1, "0x01", "LEVEL_CONTROL", "STEP", "0", "S_BUTTON_3", "S_BUTTON_ACTION_SHORT_RELEASED", "B3"],
                 [1, "0x01", "LEVEL_CONTROL", "STEP", "1", "S_BUTTON_4", "S_BUTTON_ACTION_SHORT_RELEASED", "B4"],
                 [1, "0x01", "LEVEL_CONTROL", "MOVE", "0", "S_BUTTON_3", "S_BUTTON_ACTION_HOLD", "B3H"],
-                [1, "0x01", "LEVEL_CONTROL", "STOP", "0", "S_BUTTON_3", "S_BUTTON_ACTION_SHORT_RELEASED", "B3R"],
+                [1, "0x01", "LEVEL_CONTROL", "STOP", "0", "S_BUTTON_3", "BUTTON_ACTION_HOLD_RELEASED", "B3R"],
                 [1, "0x01", "LEVEL_CONTROL", "MOVE", "1", "S_BUTTON_4", "S_BUTTON_ACTION_HOLD", "B4L"],
-                [1, "0x01", "LEVEL_CONTROL", "STOP", "1", "S_BUTTON_4", "S_BUTTON_ACTION_SHORT_RELEASED", "B4R"]
+                [1, "0x01", "LEVEL_CONTROL", "STOP", "1", "S_BUTTON_4", "BUTTON_ACTION_HOLD_RELEASED", "B4R"]
             ]
         },
         "legrandSceneRemote": {
